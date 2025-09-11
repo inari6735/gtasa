@@ -1,0 +1,27 @@
+.container {
+    min-height: 100dvh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    overflow: hidden;
+    place-items: center;
+    display: grid;
+}
+
+.menu {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu a {
+    text-decoration: none;
+    text-align: center;
+    background: #efefef;
+    border: solid 1px #767676;
+    appearance: auto;
+    color: black;
+    padding: 5px;
+    margin-block: 5px;
+}

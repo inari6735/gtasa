@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/security/main.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="background-image: url('{{ asset('images/login-wallpaper.jpg') }}');">
+        <form class="form" method="post">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <img class="form-image" src="{{ asset('images/sign-in.png') }}" alt="">
+
+            <div class="field-wrapper">
+                <label for="username">Email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-input" autocomplete="email" required autofocus>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="password">Password</label>
+                <input type="password" name="_password" id="password" class="form-input" autocomplete="current-password" required>
+            </div>
+
+            <button class="form-button" type="submit">
+                Sign in
+            </button>
+
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+        </form>
+    </div>
+{% endblock %}
