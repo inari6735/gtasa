@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Security\Application\Form\RegistrationFormType;
-use App\Security\Application\Service\EmailVerifier;
-use App\Security\Domain\Entity\User;
+use App\Security\Form\RegistrationFormType;
+use App\Security\Service\EmailVerifier;
+use App\Shared\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

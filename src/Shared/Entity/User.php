@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Security\Domain\Entity;
+namespace App\Shared\Entity;
 
-use App\Security\Infrastructure\Repository\UserRepository;
+use App\Shared\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -12,12 +13,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?string $id = null;
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
@@ -37,7 +40,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    public function getId(): ?int
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
+    private DateTimeInterface $createdAt;
+
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
+    private DateTimeInterface $updatedAt;
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->createdAt = $this->createdAt ?? new \DateTimeImmutable();
+        $this->updatedAt = $this->createdAt;
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -127,5 +149,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTimeInterface
+    {
+        return $this->updatedAt;
     }
 }

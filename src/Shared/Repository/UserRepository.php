@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Security\Infrastructure\Repository;
+namespace App\Shared\Repository;
 
-use App\Security\Domain\Entity\User;
+use App\Shared\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -31,5 +31,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function findByIdentifier(string $identifier): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.email = :identifier')
+            ->setParameter('identifier', $identifier)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Media{% endblock %}
+
+{% block body %}
+    <h1>Upload media</h1>
+
+    {{ form_start(form) }}
+    {{ form_row(form.file) }}
+    {{ form_row(form.visibility) }}
+    {{ form_row(form.save) }}
+    {{ form_end(form) }}
+{% endblock %}

@@ -1,14 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace App\MediaHandling\Domain\Entity;
+namespace App\Shared\Entity;
 
+use App\Media\Model\Enum\MediaVisibility;
+use App\Shared\Repository\MediaRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Entity(repositoryClass: MediaRepository::class)]
 #[ORM\Table(name: 'media')]
-#[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
-class MediaORM
+class Media
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
@@ -16,26 +18,33 @@ class MediaORM
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     public ?string $id = null;
 
-    #[ORM\Column(name: "url", length: 2000)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    private User|null $user = null;
+
+    #[ORM\Column(name: "url", length: 2000, nullable: true)]
     private ?string $url = null;
 
     #[Orm\Column(name: 'filename', length: 200)]
-    private ?string $filename = null;
+    private string $filename = '';
 
     #[Orm\Column(name: 'original_filename', length: 200)]
-    private ?string $originalFilename = null;
+    private string $originalFilename = '';
 
-    #[Orm\Column(name: 'relative_path', length: 1000)]
-    private ?string $relativePath = null;
+    #[Orm\Column(name: 'path', length: 1000)]
+    private string $path = '';
 
     #[Orm\Column(name: 'mime_type', length: 20)]
-    private ?string $mimeType = null;
+    private string $mimeType = '';
 
     #[Orm\Column(name: 'extension', length: 20)]
-    private ?string $extension = null;
+    private string $extension = '';
 
     #[Orm\Column(name: 'size')]
-    private ?int $filesize = null;
+    private int $filesize = 0;
+
+    #[Orm\Column(name: 'visibility')]
+    private string $visibility = MediaVisibility::PRIVATE->value;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
     private DateTimeInterface $createdAt;
@@ -61,7 +70,18 @@ class MediaORM
         return $this->id;
     }
 
-    public function getMimeType(): ?string
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): Media
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getMimeType(): string
     {
         return $this->mimeType;
     }
@@ -71,7 +91,7 @@ class MediaORM
 
         return $this;
     }
-    public function getFilename(): ?string
+    public function getFilename(): string
     {
         return $this->filename;
     }
@@ -85,7 +105,7 @@ class MediaORM
     {
         return $this->url;
     }
-    public function setUrl(string $url): static
+    public function setUrl(?string $url): static
     {
         $this->url = $url;
 
@@ -102,18 +122,18 @@ class MediaORM
         return $this->updatedAt;
     }
 
-    public function setRelativePath(?string $relativePath): MediaORM
+    public function setPath(string $path): Media
     {
-        $this->relativePath = $relativePath;
+        $this->path = $path;
         return $this;
     }
 
-    public function getRelativePath(): ?string
+    public function getPath(): string
     {
-        return $this->relativePath;
+        return $this->path;
     }
 
-    public function setOriginalFilename(?string $originalFilename): MediaORM
+    public function setOriginalFilename(string $originalFilename): Media
     {
         $this->originalFilename = $originalFilename;
         return $this;
@@ -124,25 +144,36 @@ class MediaORM
         return $this->originalFilename;
     }
 
-    public function setExtension(?string $extension): MediaORM
+    public function setExtension(string $extension): Media
     {
         $this->extension = $extension;
         return $this;
     }
 
-    public function getExtension(): ?string
+    public function getExtension(): string
     {
         return $this->extension;
     }
 
-    public function setFilesize(?int $filesize): MediaORM
+    public function setFilesize(int $filesize): Media
     {
         $this->filesize = $filesize;
         return $this;
     }
 
-    public function getFilesize(): ?int
+    public function getFilesize(): int
     {
         return $this->filesize;
+    }
+
+    public function getVisibility(): string
+    {
+        return $this->visibility;
+    }
+
+    public function setVisibility(string $visibility): Media
+    {
+        $this->visibility = $visibility;
+        return $this;
     }
 }

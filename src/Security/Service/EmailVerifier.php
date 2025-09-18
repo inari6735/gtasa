@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Security\Application\Service;
+namespace App\Security\Service;
 
-use App\Security\Domain\Entity\User;
+use App\Shared\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
