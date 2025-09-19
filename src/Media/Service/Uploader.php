@@ -2,9 +2,14 @@
 
 namespace App\Media\Service;
 
+use App\Media\Config\FilenameProcessor;
+use App\Media\Config\UploadPath;
 use App\Media\Model\Enum\MediaVisibility;
+use App\Media\Model\Enum\UploadStatus;
 use App\Media\Service\Creator\MediaCreator;
+use App\Shared\Entity\UploadSession;
 use App\Shared\Repository\MediaRepository;
+use App\Shared\Repository\UploadSessionRepository;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -14,12 +19,16 @@ readonly class Uploader
         private MediaCreator $mediaCreator,
         private FilesystemOperator $publicStorage,
         private FilesystemOperator $privateStorage,
+        private FilesystemOperator $tempStorage,
         private MediaRepository $mediaRepository,
+        private UploadSessionRepository $uploadSessionRepository,
+        private FilenameProcessor $filenameProcessor,
+        private UploadPath $uploadPath
     ) {}
 
     public function upload(UploadedFile $file, MediaVisibility $visibility): void
     {
-        $media = $this->mediaCreator->createMedia($file, $visibility);
+        $media = $this->mediaCreator->create($file, $visibility);
         $fs = $this->getFilesystem($visibility);
 
         try {
@@ -29,6 +38,81 @@ readonly class Uploader
         }
     }
 
+    public function uploadChunk(UploadedFile $chunk, string $uploadId): bool
+    {
+        $uploadSession = $this->uploadSessionRepository->findById($uploadId);
+
+        if (!$uploadSession) {
+            return false;
+        }
+
+        $index = $uploadSession->getReceivedChunks() + 1;
+        $chunkName = $this->createChunkName($index, $uploadSession->getFilename(), $uploadSession->getTotalChunks());
+        $chunkPath = UploadPath::chunkPath($uploadId, $chunkName);
+
+        try {
+            $this->tempStorage->write($chunkPath, $chunk->getContent());
+            $uploadSession->setReceivedChunks($index);
+            $this->uploadSessionRepository->save($uploadSession);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function assemble(UploadSession $uploadSession, MediaVisibility $visibility): string
+    {
+        if ($uploadSession->getStatus() === UploadStatus::COMPLETED->value) {
+            throw new \RuntimeException('The upload session has been completed.');
+        }
+
+        $chunks = $uploadSession->getReceivedChunks();
+
+        $media = $this->mediaCreator->createFromUploadSession($uploadSession, $visibility);
+        $dest = $media->getPath();
+
+        $fs = $this->getFilesystem($visibility);
+
+        try {
+            for ($i = 0; $i < $chunks; $i++) {
+                $index = $i + 1;
+                $chunkName = $this->createChunkName($index, $uploadSession->getFilename(), $uploadSession->getTotalChunks());
+                $chunkPath = UploadPath::chunkPath($uploadSession->getId(), $chunkName);
+
+                if (!$this->tempStorage->fileExists($chunkPath)) {
+                    throw new \RuntimeException("Missing chunk $i");
+                }
+
+                $chunk = $this->tempStorage->readStream($chunkPath);
+                if (!is_resource($chunk)) {
+                    throw new \RuntimeException("Cannot open chunk stream: $chunkPath");
+                }
+
+                $fs->writeStream($dest, $chunk);
+            }
+
+            if (!$fs->fileExists($dest)) {
+                throw new \RuntimeException("File not created: $dest");
+            }
+
+            for ($i = 0; $i < $chunks; $i++) {
+                $index = $i + 1;
+                $chunkName = $this->createChunkName($index, $uploadSession->getFilename(), $uploadSession->getTotalChunks());
+                $chunkPath = UploadPath::chunkPath($uploadSession->getId(), $chunkName);
+
+                $this->tempStorage->delete($chunkPath);
+            }
+
+            $this->tempStorage->deleteDirectory($uploadSession->id);
+        } catch (\Throwable $e) {
+            $this->mediaRepository->delete($media);
+            return 'file not created';
+        }
+
+        return $media->getPath();
+    }
+
     private function getFilesystem(MediaVisibility $visibility): FilesystemOperator
     {
         if ($visibility === MediaVisibility::PUBLIC) {
@@ -36,5 +120,13 @@ readonly class Uploader
         }
 
         return $this->privateStorage;
+    }
+
+    private function createChunkName(int $receivedChunks, string $filename, int $totalChunks): string
+    {
+        $safeFilename = $this->filenameProcessor->safeFilename($filename);
+        $index = $receivedChunks + 1;
+
+        return $this->filenameProcessor->chunkName($safeFilename, $index, $totalChunks);
     }
 }

@@ -22,4 +22,14 @@ readonly class FilenameProcessor
     {
         return $this->slugger->slug($filename)->toString();
     }
+
+    public function chunkName(string $filename, int $index, int $total): string
+    {
+        $pad = 8;
+
+        return sprintf(
+            '%s.part.%0'.$pad.'d.of.%0'.$pad.'d',
+            $filename, $index, $total
+        );
+    }
 }

@@ -13,6 +13,7 @@ use App\Media\Model\ValueObject\Path;
 use App\Media\Model\ValueObject\Url;
 use App\Shared\Context;
 use App\Shared\Entity\Media;
+use App\Shared\Entity\UploadSession;
 use App\Shared\Repository\MediaRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -25,7 +26,7 @@ readonly class MediaCreator
         private Context $context
     ) {}
 
-    public function createMedia(
+    public function create(
         UploadedFile $file,
         MediaVisibility $visibility,
     ): Media
@@ -44,7 +45,43 @@ readonly class MediaCreator
             $url = Url::create('http://localhost/uploads');
         }
 
-        $media = $this->builder->buildEntity(
+        $media = $this->builder->build(
+            $url,
+            $filename,
+            $originalFilename,
+            $path,
+            $mimeType,
+            $extension,
+            $filesize,
+            $visibility,
+            $user
+        );
+
+        $this->mediaRepository->save($media);
+
+        return $media;
+    }
+
+    public function createFromUploadSession(
+        UploadSession $uploadSession,
+        MediaVisibility $visibility,
+    ): Media
+    {
+        $extension = Extension::create($uploadSession->getExtension());
+        $filename = Filename::create(FilenameProcessor::create($extension->value()));
+        $user = $this->context->getUser();
+        $path = Path::create(UploadPath::userMediaPath($user->getId(), $filename->value()));
+        $safeFilename = $this->filenameProcessor->safeFilename($uploadSession->getFilename());
+        $originalFilename = Filename::create($safeFilename);
+        $mimeType = MimeType::create($uploadSession->getMimeType());
+        $filesize = Filesize::create($uploadSession->getFilesize());
+
+        $url = Url::create(null);
+        if ($visibility === MediaVisibility::PUBLIC) {
+            $url = Url::create('http://localhost/uploads');
+        }
+
+        $media = $this->builder->build(
             $url,
             $filename,
             $originalFilename,

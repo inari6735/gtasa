@@ -11,3 +11,8 @@ flysystem:
             options:
                 directory: '%kernel.project_dir%/public/uploads'
 #            public_url_generator: 'App\MediaHandling\Infrastructure\Filesystem\CdnUrlGenerator'
+        temp.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/uploads/temp'
+            visibility: 'private'

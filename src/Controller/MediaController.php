@@ -18,7 +18,7 @@ final class MediaController extends AbstractController
         $input = new MediaInput();
         $form = $this->createForm(MediaType::class, $input);
 
-        $processed = $handler->handle($form, $request, $input);
+        $handler->handle($form, $request, $input);
 
         return $this->render('media/media.html.twig', [
             'form' => $form->createView()

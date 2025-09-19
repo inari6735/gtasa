@@ -34,13 +34,13 @@ class Media
     #[Orm\Column(name: 'path', length: 1000)]
     private string $path = '';
 
-    #[Orm\Column(name: 'mime_type', length: 20)]
+    #[Orm\Column(name: 'mime_type', length: 100)]
     private string $mimeType = '';
 
     #[Orm\Column(name: 'extension', length: 20)]
     private string $extension = '';
 
-    #[Orm\Column(name: 'size')]
+    #[Orm\Column(name: 'size', type: 'bigint')]
     private int $filesize = 0;
 
     #[Orm\Column(name: 'visibility')]

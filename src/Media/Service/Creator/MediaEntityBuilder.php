@@ -14,7 +14,7 @@ use App\Shared\Entity\User;
 
 class MediaEntityBuilder
 {
-    public function buildEntity(
+    public function build(
         Url $url,
         Filename $filename,
         Filename $originalFilename,
