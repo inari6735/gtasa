@@ -28,10 +28,10 @@ class UploadSession
     #[ORM\Column(name: 'filename', length: 200)]
     private string $filename = '';
 
-    #[ORM\Column(name: 'received_chunks')]
+    #[ORM\Column(name: 'received_chunks', type: 'integer')]
     private int $receivedChunks = 0;
 
-    #[ORM\Column(name: 'total_chunks')]
+    #[ORM\Column(name: 'total_chunks', type: 'integer')]
     private int $totalChunks;
 
     #[ORM\Column(name: 'chunk_size', type: 'bigint')]

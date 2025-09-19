@@ -5,7 +5,7 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/uploads'
-            visibility: 'private'
+#            visibility: 'private'
         public.storage:
             adapter: 'local'
             options:
@@ -15,4 +15,4 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/uploads/temp'
-            visibility: 'private'
+#            visibility: 'private'
