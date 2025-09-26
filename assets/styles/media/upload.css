@@ -1,0 +1,43 @@
+.uploader {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+}
+
+.form-file {
+    border: 3px dotted black;
+}
+
+
+.form-label {
+
+}
+
+.form-file {
+    width: 100%;
+    padding: 10px;
+}
+
+.form-submit {
+    width: 100%;
+    padding: 5px;
+}
+
+.progress-bar {
+    height: 15px;
+    width: 100%;
+    border: 3px solid black;
+    border-radius: 0;
+
+    &::-webkit-progress-value {
+        background-color: #cbcbcb;
+    }
+
+    &::-webkit-progress-bar {
+        background-color: #636363;
+    }
+
+    &::-moz-progress-bar {
+        background-color: #636363;
+    }
+}

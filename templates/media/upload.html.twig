@@ -2,21 +2,25 @@
 
 {% block title %}Media{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/media/upload.css') }}">
+{% endblock %}
+
 {% block body %}
-    <div data-controller="upload">
+    <div class="uploader" data-controller="upload">
         <form data-action="submit->upload#submit">
-            <label for="file">Select a file to upload</label>
-            <input type="file" id="file" name="file" data-action="change->upload#resetProgress">
-
-            <label for="isPublic">Select a file to upload</label>
-            <input type="checkbox" id="isPublic" name="isPublic">
-
-            <input type="submit" value="Submit">
+            <div class="input-wrapper">
+                <input class="form-input form-file" type="file" id="file" name="file" data-action="change->upload#onFilesSelected" multiple>
+            </div>
+            <div class="input-wrapper">
+                <label class="form-label" for="isPublic">Publiczny</label>
+                <input class="form-input" type="checkbox" id="isPublic" name="isPublic">
+            </div>
+            <div class="input-wrapper">
+                <input class="form-submit" type="submit" value="Submit">
+            </div>
         </form>
 
-        <div class="progress-bar">
-            <progress value="0" max="100" data-upload-target="bar" style="width: 320px;"></progress>
-            <span data-upload-target="label">0%</span>
-        </div>
+        <div class="uploads" data-upload-target="list" aria-live="polite"></div>
     </div>
 {% endblock %}

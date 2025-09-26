@@ -71,7 +71,6 @@ readonly class Uploader
 
         $media = $this->mediaCreator->createFromUploadSession($uploadSession, $visibility);
         $dest = $media->getPath();
-        $tempFolder = "$uploadSession->id/";
 
         $fs = $this->getFilesystem($visibility);
 
