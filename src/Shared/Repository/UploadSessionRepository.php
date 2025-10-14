@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Shared\Repository;
 
@@ -43,15 +45,14 @@ class UploadSessionRepository extends ServiceEntityRepository
 
         $query = $this->getEntityManager()->createQuery($dql)
             ->setParameter('fingerprint', $fingerprint)
-            ->setParameter('status', UploadStatus::ACTIVE->value)
-;
+            ->setParameter('status', UploadStatus::ACTIVE->value);
         $results = $query->getResult();
         if (empty($results)) {
             return null;
         }
 
         /**
-         * @var $result UploadSession
+         * @var UploadSession $result
          */
         foreach ($results as $result) {
             if ($result->getUser()->getId() === $userId) {

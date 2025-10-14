@@ -5,14 +5,27 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
     overflow: hidden;
-    place-items: center;
-    display: grid;
+    display: flex;
+    flex-direction: column;
+}
+
+.wrapper {
+    display: flex;
+    height: 95vh;
+}
+
+.header-menu {
+    height: 5vh;
+    width: 100%;
+    background: #efefef;
 }
 
 .menu {
-    width: 300px;
+    width: 200px;
     display: flex;
     flex-direction: column;
+    background: #efefef;
+    height: 100%;
 }
 
 .menu a {

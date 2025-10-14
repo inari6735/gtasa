@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -10,8 +12,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UploadController extends AbstractController
 {
-    public function __construct(private readonly UploadHandler $handler)
-    {}
+    public function __construct(private readonly UploadHandler $handler) {}
+
     #[Route('/upload', name: 'app_upload')]
     public function upload(): Response
     {

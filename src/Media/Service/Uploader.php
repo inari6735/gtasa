@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Media\Service;
 
@@ -33,7 +35,7 @@ readonly class Uploader
 
         try {
             $fs->write($media->getPath(), $file->getContent());
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             $this->mediaRepository->delete($media);
         }
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Media\Service\Handler;
 
@@ -20,8 +22,7 @@ readonly class UploadHandler
         private UploadSessionRepository $uploadSessionRepository,
         private UploadSessionCreator $creator,
         private Context $context
-    )
-    {}
+    ) {}
     public function handleInit(Request $request): UploadResponse
     {
         $payload = $request->getPayload();
@@ -43,7 +44,7 @@ readonly class UploadHandler
             $fileLastModified = new \DateTime()->setTimestamp($modified);
         }
 
-        return Fingerprint::create($this->context->getUser()->getId(), $payload->get('filename'), $payload->get('filesize'), $fileLastModified);
+        return Fingerprint::create($this->context->getUser()->getId(), $payload->getString('filename'), $payload->getInt('filesize'), $fileLastModified);
     }
 
     public function handleChunk(Request $request): bool
