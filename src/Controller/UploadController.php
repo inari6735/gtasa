@@ -14,7 +14,7 @@ class UploadController extends AbstractController
 {
     public function __construct(private readonly UploadHandler $handler) {}
 
-    #[Route('/upload', name: 'app_upload')]
+    #[Route('/upload', name: 'app_upload', methods: ['POST'])]
     public function upload(): Response
     {
         return $this->render('media/upload.html.twig');

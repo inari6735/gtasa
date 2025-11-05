@@ -23,6 +23,22 @@ readonly class UploadHandler
         private UploadSessionCreator $creator,
         private Context $context
     ) {}
+
+    public function handleUpload(Request $request): void
+    {
+        /**
+         * @var UploadedFile $file
+         */
+        $file = $request->files->get('file');
+        $visibility = MediaVisibility::from((string) $request->request->get('isPublic'));
+
+        $this->uploader->upload($file, $visibility);
+
+        if (strpos($file->getMimeType(), 'image/') === 0) {
+            echo 'processImage';
+        }
+    }
+
     public function handleInit(Request $request): UploadResponse
     {
         $payload = $request->getPayload();
